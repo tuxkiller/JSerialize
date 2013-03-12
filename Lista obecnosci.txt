@@ -7,3 +7,6 @@ Karol Buler
 Robert Szulczynski
 Krzysztof Paszuk
 Krzysztof Jelinek
+Adrian Skotnicki
+Micha³ Krakiewicz
+Pawe³ Pojmicz
