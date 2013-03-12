@@ -9,4 +9,7 @@ Krzysztof Paszuk
 Krzysztof Jelinek
 Adrian Skotnicki
 Micha³ Krakiewicz
+<<<<<<< HEAD
 Pawe³ Pojmicz
+=======
+>>>>>>> e7f39f118b703d1bf29d5e956b269ca434584cb6
