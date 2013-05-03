@@ -1,4 +1,4 @@
-JSerialize
+﻿JSerialize
 ==========
 
 An University of Zielona Góra student's project about serialization to JSON format in Java language.
@@ -89,7 +89,7 @@ modyfikujemy zawartość (załóżmy ze zmiany w pliku o nazwe plik.txt), po czy
 - ****git push***** -- tylko przed uprzednim otrzymaniem zgody koordynatora, chyba, ze pracujemy na osobnym od innych 
 branchu
 
-
+5 CZERWCA ODDANIE
 
 
 
