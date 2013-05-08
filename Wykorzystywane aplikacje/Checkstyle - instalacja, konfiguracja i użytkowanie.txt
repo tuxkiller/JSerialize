@@ -1,0 +1,22 @@
+	Checkstyle jest open soure'owym plug-inem do Eclipse'a pe³ni¹cym rolê analizatora kodu. Pozwala na sprawdzanie programów pod k¹tem poprawnoœci zastosowanych zasad kodowania (przede wszystkim zasady stylistyczne).
+
+1. Instalacja:
+  -W³¹czamy Eclipse
+  -Klikamy: Help -> Install New Software	
+  -Klikamy przycisk 'Add...'
+  -W 'Name' podajemy dowoln¹ nazwê (najlepiej nazwê narzêdzia)
+  -W 'Location' podajemy œcie¿kê: http://eclipse-cs.sf.net/update/
+  -Zatwierdzamy - OK
+  -W rozsuwanej liœcie 'Work with:' odszukujemy dodan¹ przed chwil¹ pozycjê
+  -W okienku poni¿ej listy pojawi siê pozycja z plug-inem Checkstyle - wybieramy 	
+	interesuj¹c¹ nas wersjê 'Eclipse Checkstyle Plug-in' i j¹ zaznaczamy
+  -Klikamy 'Next', akceptujemy licencjê i postêpujemy zgodnie z procesem instalacyjnym. Ignorujemy ewentualne 		informacje o 'nieautoryzowanym narzedziu'.
+  -Po zakoñczonej instalacji narzêdzia nale¿y uruchomiæ Eclipse ponownie.
+
+2. Konfiguracja:
+  -Klikamy: Prawy przycisk myszy na Projekt -> 'Properties'
+  -Z listy "Simple - use the following check configuration for all files" 
+	-> Wybieramy "Sun Checks (Eclipse) - (Global)".
+
+3. U¿ytkowanie
+	Po skonfigurowaniu narzêdzia po prostu klikamy prawym przyciskiem myszy     wewn¹trz kodu i z rozsuwanej listy wybieramy: 'Checkstyle' -> 'Check Code with   Checkstyle'. Problematyczne fragmenty kodu oznaczone zostan¹ zó³tym kolorem, a po   najechaniu kursorem na znaczniki po lewej stronie bêdziemy mogli odczytaæ z czego   wynikaj¹ odnalezione problemy.
