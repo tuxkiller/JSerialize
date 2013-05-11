@@ -1,0 +1,26 @@
+PMD jest analizatorem kodu Ÿród³owego. Ukazuje typowe wady programowania 
+takie jak niewykorzystane zmienne, puste bloki, niepotrzebnego tworzenia obiektów, itp. 
+Obs³uguje Java, JavaScript, XML, XSL. Dodatkowo zawiera CPD. 
+CPD znajduje podwójny kod w jêzyku Java, C, C + +, C #, PHP, Ruby, Fortran, JavaScript.
+
+Instalcja pluginu PMD:
+1. W celu instalacji pluginu nale¿y uruchomiæ Eclipse, nastêpnie przechodzimy do zak³adki "HELP"
+   i kolejno wybieramy Install New Software:
+2. Klikamy przycisk "Add..."
+3. W nowo otwartym oknie w pole "Name" wpisujemy przyk³adow¹ nazw "PMD_Plugin" nastomiast w "Location"
+   podjaemy nastêpuj¹cy adres "http://pmd.sourceforge.net/eclipse/" i klikamy "OK"
+4. Z podanej listy nale¿y wybraæ odpowiedni¹ wersjê Eclipse resztê ustawieñ pozostawiamy bez zmian
+5. Klikamy "Next" w drugiem okenie równie¿ "Next.
+6. Nastêpnie akcpetujemy regulami i na koniec "Finish"
+7. Czekamy a¿ instalacja plugini zostanie zakoñczona.
+UWAGA: W trakcie instalcji mo¿na napotkaæ komunikaty o "Nieautoryzowanym oprogramowaniu" w takiej sytuacji klikamy "OK"
+8. Po zakoñczeniu instalcji uka¿e siê komunikat o koniecznoœci restartu programu akcpetuj¹ przyciskiem "Yes".
+
+Konfiguracja:
+1. W celu poprawnej kofiguracji musimy otworzyæ now¹ perspektywê klikaj¹c przycisk "Open Perspective" w prawym górnym rogu programu(Uk³ad mo¿e    siê ró¿niæ w zale¿noœci od ustawieñ programu przez u¿ytknika).
+2.Z ukazanej listy nale¿y wybraæ nazwê któr¹ podaliœcie podczas instalacji pluginu
+   w moim przypadku jest to PMD_Plguin, zatwierdzamy wybór przyciskiem OK.
+3. Po wybraniu odpowiedniego pluginy zmieni siê uk³ad okien programu.
+4. Klkajac prawym przyciskiem myszy obojêtnie w którym miejscu kodu programu przechodzimy do opcji PMD i Wybieramy opcje "Check Code"
+w zale¿nosci od wersji nazwa tej opcji mo¿e nieznacznie siê ró¿niæ.
+5. W taki o to sposób pierwszy raz przeanalizowaliœcie kod. W razie jakichkolwiek b³êdów w danej linijce ukaza¿e siê wam ¿ó³ty lub czerwony znacznik.Natomiast  w oknie Violation Overview oraz Violation Outline zobaczy powodu b³êdów.
