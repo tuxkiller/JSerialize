@@ -4,10 +4,12 @@ import java.io.InputStream;
 import java.util.Map;
 
 public class JSerializeReaderImpl implements JSerializeReader{
+	Object deserializedObject;
 
 	@Override
-	public Object fromMap(Map<String, Object> map) {
-		return null;
+	public void fromMap(Map<String, Object> map) {
+		Object ob = new Object();
+		deserializedObject = ob;
 	}
 
 	@Override
