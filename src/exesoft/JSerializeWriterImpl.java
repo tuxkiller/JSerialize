@@ -10,37 +10,36 @@ import java.util.Map.Entry;
 import java.util.Iterator;
 
 public class JSerializeWriterImpl implements JSerializeWriter {
-		
-	Map<String, Object> ObjectsMap = new HashMap<String, Object>();
-	
-	public JSerializeWriterImpl() {
-		
+	Object obToSerialize;
+			
+	public JSerializeWriterImpl(Object ob) {
+		obToSerialize = ob;
 	}
 	
 	@Override
-	public Map<String, List<Map<String, Object>>> toMap(Object ob) {
-		
+	public Map<String,  Object> toMap() {
+		Map<String,  Object> map = new HashMap<String,  Object>();
 		@SuppressWarnings("rawtypes")
-		Class c = ob.getClass();
+		Class c = obToSerialize.getClass();
 		for (Field field : getFields(c)) {			
 			setPublic(field);
 			Object value;
 			try {
-				value = field.get(ob);
+				value = field.get(obToSerialize);
 			} catch (Exception e1) {
 				continue;
 			} 
 			
 		    if(isPrimitive(field)){
-					ObjectsMap.put(getTypeName(field), value);
+					map.put(getTypeName(field), value);
 		    }else{
 		    	String type = getTypeName(field);
 		    	//System.out.println(type);
-		    	if(type.equals("java.lang.String")) ObjectsMap.put("String", value);
+		    	if(type.equals("java.lang.String")) map.put("String", value);
 		    	//TODO ADD MORE TYPES		    	
 		    }
 		}
-		return null;
+		return map;
 	}
 	
 	boolean isPrimitive(Field field){
@@ -68,7 +67,8 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 	
 	//FOR TESTING PURPOSES ONLY
 	public void printMap(){
-	    Iterator<Entry<String, Object>> it = ObjectsMap.entrySet().iterator();
+		Map<String,  Object> map = toMap();
+	    Iterator<Entry<String, Object>> it = map.entrySet().iterator();
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
 	        System.out.println(pairs.getKey() + " = " + pairs.getValue());
