@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface JSerializeReader {
 
-	Object fromMap(Map<String, List<Map<String,Object>>> map);
+	Object fromMap(Map<String, Object> map);
 	
 	Boolean readObject(InputStream input);
 }
