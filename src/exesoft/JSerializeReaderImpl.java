@@ -29,9 +29,10 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	private Map<String, Object> objectHashMap;
 
 	@Override
-	public void fromMap(Map<String, Object> map) {
+	public Object fromMap(Map<String, Object> map) {
 		Object ob = new Object();
-		deserializedObject = ob;
+		
+		return deserializedObject;
 
 	}
 
@@ -69,7 +70,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		return true;
 	}
 
-	private Map<String, Object> sampleHashMap() {
+	public Map<String, Object> sampleHashMap() {
 		/**
 		 * 
 		 * { "Osoba" => { [0] => {"String" => "x" }, [1] => {"String" => "y" }
@@ -78,11 +79,22 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		 */
 		Map<String, Object> tmp = new HashMap<String, Object>();
 		Map<String, Object> inner = new HashMap<String, Object>();
-//		inner.put("0",new HashMap<>())
-//		tmp.put("Osoba", value)
+		Map<String, Object> x = new HashMap<String, Object>();
+		Map<String, Object> y = new HashMap<String, Object>();
+		y.put("String", "y");
+		x.put("String", "x");
+		inner.put("0",x);
+		inner.put("1",y);
+		tmp.put("Osoba", inner);
 		
 		
 		return tmp;
 		
+	}
+	
+	public static void main(String[] args) {
+		JSerializeReaderImpl r = new JSerializeReaderImpl();
+		Map<String, Object> m = r.sampleHashMap();
+		System.out.println(m.toString());
 	}
 }
