@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface JSerializeWriter{
 	
-	Map<String, Object> toMap();
+	Map<String, Object> prepareMap(Object ob);
 	boolean writeObject(OutputStream os);
-	void printMap(); //FOR TESTING ONLY. WILL BE REMOVED
+	void printMap(Map<String,  Object> map); //FOR TESTING ONLY. WILL BE REMOVED
 }
