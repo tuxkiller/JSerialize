@@ -1,12 +1,14 @@
 package exesoft;
 
+import java.util.Map;
+
 public class JModel{
 
-	public String encode(String toJson){ 
-		return toJson;
+	public String encode(Map<String, Object> toJson){ 
+		return null;
 	}
-	public String decode(String fromJson){
-		return fromJson; 
+	public Map<String, Object> decode(String fromJson){
+		return null; 
 	}
 
 }
