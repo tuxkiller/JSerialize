@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * 
- *  JSerializeReader – Klasa odpowiedzialna za odwzorowanie obiektu
+ *  JSerializeReader - Klasa odpowiedzialna za odwzorowanie obiektu
  *  na podstawie informacji uzyskanych z obiektu klasy JModel, która w procesie dekodowania
  *  (metoda decode) wytworzy obiekt klasy String o strukturze jak wyżej w przykładzie.
  *  (Nie wiem jeszcze jak to będzie ale na 90% będzie zwracany przez funkcję statyczną albo
