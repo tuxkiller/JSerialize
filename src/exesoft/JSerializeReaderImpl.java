@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -43,9 +44,11 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	@Override
 	public Object fromMap(Map<String, Object> map) {
 		Object ob = new Object();
-		
-		Object inner = map.keySet();
-		Class toDeserialize = Class.forName(map., initialize, loader)
+	
+		Set inner = map.keySet();
+		inner.getClass();
+		inner.
+//		Class toDeserialize = Class.forName(inner., initialize, loader)
 
 		return deserializedObject;
 
@@ -90,7 +93,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		return true;
 	}
 
-	private Map<String, Object> sampleHashMap() {
+	public static Map<String, Object> sampleHashMap() {
 		/**
 		 * 
 		 * { "Osoba" => { [0] => {"String" => "x" }, [1] => {"String" => "y" }
