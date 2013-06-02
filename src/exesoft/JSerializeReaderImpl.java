@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,11 +32,11 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	 * @author Micha³
 	 * 
 	 */
-	class JSONElement {
+	static class JSONElement {
 
 		private String name;
 		private String type;
-		private String joinedString;
+
 		private Object innerTypes;
 
 		public JSONElement(String name, String type, Object innerTypes) {
@@ -55,6 +56,10 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 		public Object getInnerTypes() {
 			return innerTypes;
+		}
+
+		public String getStringWithHash() {
+			return new String(name + '#' + type);
 		}
 
 	}
@@ -77,32 +82,35 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	 * 
 	 * @see exesoft.JSerializeReader#fromMap(java.util.Map)
 	 */
+
+	private static final String rootClassKey = "#JSerializeMetaData#RootClassName";
+
 	@Override
 	public Object fromMap(Map<String, Object> map) {
 		Object ob = new Object();
 
-		JSONElement entry = decodeHashMapEntry(map);
-		
-		String name = entry.getName();
-		Class toDeserialize = null;
+		ArrayList<JSONElement> entry = decodeHashMapKeys(map);
 
-		try {
-			
-			toDeserialize = Class.forName(name, false, null);
-		} catch (ClassNotFoundException e) {
-			// TODO: add msg
-			e.printStackTrace();
-		} catch (NoSuchElementException e) {
-			// TODO: add msg
-			e.printStackTrace();
-		}
-
-		try {
-			ob = toDeserialize.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		String name = entry.getName();
+//		Class toDeserialize = null;
+//
+//		try {
+//
+//			toDeserialize = Class.forName(name, false, null);
+//		} catch (ClassNotFoundException e) {
+//			// TODO: add msg
+//			e.printStackTrace();
+//		} catch (NoSuchElementException e) {
+//			// TODO: add msg
+//			e.printStackTrace();
+//		}
+//
+//		try {
+//			ob = toDeserialize.newInstance();
+//		} catch (InstantiationException | IllegalAccessException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 		return deserializedObject;
 
@@ -147,22 +155,62 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		return true;
 	}
 
-	public static JSONElement decodeHashMapEntry(Map<String, Object> map) {
+	protected static ArrayList<JSONElement> decodeHashMapKeys(
+			Map<String, Object> map) {
+
+		ArrayList<JSONElement> tmp = new ArrayList<>();
 
 		Set keys = map.keySet();
+
 		if (keys.size() == 0) {
 			// empty hashmap?
 			return null;
-		} else if (keys.size() > 1) {
-			// hashmap should contain only 1 entry!
-			throw new InvalidParameterException("Hashmap: \n" + map.toString()
-					+ "\ncontains more than 1 entry!");
 		}
-		Iterator<String> tmp = keys.iterator();
-		String encodedName = tmp.next();
 
-		return null;
+		Iterator<String> i = keys.iterator();
 
+		while (i.hasNext()) {
+			
+			String full_string = i.next();
+
+			int hash_index = full_string.indexOf('#');
+
+			if (hash_index == -1) {
+				throw new java.security.InvalidParameterException('"'
+						+ full_string + '"'
+						+ " doesn't contain a hash (#) in hashmap name: \n"
+						+ map.toString());
+			}
+			String name = full_string.substring(0, hash_index);
+			String type = full_string.substring(hash_index + 1,
+					full_string.length());
+			
+			tmp.add(new JSONElement(name, type, map.get(full_string)));
+
+		}
+
+		return tmp;
+
+	}
+
+	/**
+	 * @param map
+	 * @return JSONElement with name of the class, and innerTypes contatinng the map withou class name
+	 */
+	protected static JSONElement decodeRootClassName(Map<String, Object> map) {
+		Object tmp = null;
+		tmp = map.get(rootClassKey);
+
+		String name = (String) tmp;
+
+		if (name.isEmpty()) {
+			throw new InvalidParameterException("Hashmap: \n" + map.toString()
+					+ "\ndoesn't contain class name (" + rootClassKey + ") !");
+		}
+		
+		map.remove(rootClassKey);
+
+		return new JSONElement(name, rootClassKey, map);
 	}
 
 }
