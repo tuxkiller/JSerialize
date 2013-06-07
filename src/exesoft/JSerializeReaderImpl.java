@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
 /**
  * 
  * JSerializeReader - Klasa odpowiedzialna za odwzorowanie obiektu na podstawie
@@ -39,6 +41,9 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		private String type;
 
 		private Map<String, Object> innerTypes;
+		private Object innerObject;
+
+		private boolean hasObject = false;
 
 		public JSONElement(String name, String type,
 				Map<String, Object> innerTypes) {
@@ -46,6 +51,15 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			this.name = name;
 			this.type = type;
 			this.innerTypes = innerTypes;
+		}
+
+		public void setObject(Object o) {
+			innerObject = o;
+			hasObject = true;
+		}
+
+		public boolean hasObject() {
+			return hasObject;
 		}
 
 		public String getName() {
@@ -131,15 +145,19 @@ public class JSerializeReaderImpl implements JSerializeReader {
 					.getInnerTypes());
 
 			for (JSONElement jsonElement : members) {
-				dbg("Deserializing member: " + jsonElement.getType() + " " +jsonElement.getName());
-//				dbg("Member contents: " )
+				dbg("Deserializing member: " + jsonElement.getType() + " "
+						+ jsonElement.getName());
+				// dbg("Member contents: " )
 				Field tmp = deserialized
 						.getDeclaredField(jsonElement.getName());
 				tmp.setAccessible(true);
 				// tmp.set(deserializedObject, );
-			}
 
-			
+				ArrayList<JSONElement> inner = decodeHashMapKeys(jsonElement
+						.getInnerTypes());
+				dbg(" ");
+
+			}
 
 		} catch (NoSuchFieldException | SecurityException
 				| IllegalArgumentException e1) {
@@ -147,18 +165,16 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			e1.printStackTrace();
 		}
 
-	
-
 		return deserializedObject;
 
 	}
-	
+
 	public static <T> T convertInstanceOfObject(Object o, Class<T> clazz) {
-	    try {
-	        return clazz.cast(o);
-	    } catch(ClassCastException e) {
-	        return null;
-	    }
+		try {
+			return clazz.cast(o);
+		} catch (ClassCastException e) {
+			return null;
+		}
 	}
 
 	protected Object createMemberObject(JSONElement elem)
@@ -173,8 +189,6 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			Map<String, Object> innerTypes = elem.getInnerTypes();
 
 			if (innerTypes != null) {
-				
-				
 
 				ArrayList<JSONElement> members = decodeHashMapKeys((Map<String, Object>) elem
 						.getInnerTypes());
@@ -191,7 +205,8 @@ public class JSerializeReaderImpl implements JSerializeReader {
 				}
 
 			} else {
-				throw new InvalidParameterException(elem.toString() + " has no innerTypes!\n");
+				throw new InvalidParameterException(elem.toString()
+						+ " has no innerTypes!\n");
 			}
 
 			return deserializedInstance;
@@ -286,10 +301,21 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			String type = full_string.substring(hash_index + 1,
 					full_string.length());
 
-			Map<String, Object> innerTypes = (Map<String, Object>) map
-					.get(full_string);
+			Object inner = map.get(full_string);
 
-			tmp.add(new JSONElement(name, type, innerTypes));
+			if (inner instanceof Map<?, ?>) {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> innerTypes = (Map<String, Object>) inner;
+
+				tmp.add(new JSONElement(name, type, innerTypes));
+				
+			} else {
+				
+				JSONElement tmp2 = new JSONElement(name, type, null);
+				tmp2.setObject(inner);
+				tmp.add(tmp2);
+				
+			}
 
 		}
 
