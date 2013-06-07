@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -40,13 +43,12 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		private String name;
 		private String type;
 
-		private Map<String, Object> innerTypes;
+		private Object innerTypes;
 		private Object innerObject;
 
 		private boolean hasObject = false;
 
-		public JSONElement(String name, String type,
-				Map<String, Object> innerTypes) {
+		public JSONElement(String name, String type, Object innerTypes) {
 
 			this.name = name;
 			this.type = type;
@@ -70,8 +72,12 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			return type;
 		}
 
-		public Map<String, Object> getInnerTypes() {
-			return innerTypes;
+		public Map<String, Object> getAsMap() {
+			return (Map<String, Object>) innerTypes;
+		}
+
+		public List getAsList() {
+			return (List) innerTypes;
 		}
 
 		public String getStringWithHash() {
@@ -99,9 +105,9 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	 * @see exesoft.JSerializeReader#fromMap(java.util.Map)
 	 */
 
-	private boolean debug = true;
+	private static boolean debug = true;
 
-	private void dbg(String msg) {
+	private static void dbg(String msg) {
 
 		if (debug) {
 			System.err.println(msg);
@@ -142,19 +148,27 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		try {
 
 			ArrayList<JSONElement> members = decodeHashMapKeys(rootClass
-					.getInnerTypes());
+					.getAsMap());
 
 			for (JSONElement jsonElement : members) {
 				dbg("Deserializing member: " + jsonElement.getType() + " "
 						+ jsonElement.getName());
 				// dbg("Member contents: " )
-				Field tmp = deserialized
-						.getDeclaredField(jsonElement.getName());
-				tmp.setAccessible(true);
+				Field field = deserialized.getDeclaredField(jsonElement
+						.getName());
+				field.setAccessible(true);
+
+				Class<?> c = field.getType();
+
+				if (c.getName().equals(List.class.getName())) {
+
+					List l = decodeList(jsonElement, field);
+
+				}
 				// tmp.set(deserializedObject, );
 
 				ArrayList<JSONElement> inner = decodeHashMapKeys(jsonElement
-						.getInnerTypes());
+						.getAsMap());
 				dbg(" ");
 
 			}
@@ -177,6 +191,39 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		}
 	}
 
+	protected static List decodeList(JSONElement encoded, Field field) {
+
+		ArrayList<JSONElement> elems = decodeHashMapKeys((Map<String, Object>) encoded
+				.getAsMap());
+
+		Type type = field.getGenericType();
+
+		ParameterizedType pt = (ParameterizedType) type;
+
+		Type t = pt.getActualTypeArguments()[0];
+		String tmp = t.toString();
+		
+		int space = tmp.indexOf(' ');
+		
+		String name = tmp.substring(space, tmp.length());
+
+		if (debug) {
+			dbg("Name: " + name);
+			System.out.println("type: " + type);
+			System.out.println("raw type: " + pt.getRawType());
+			System.out.println("actual type args:");
+
+		}
+		List returnList = new ArrayList<>();
+
+		for (JSONElement elem : elems) {
+			dbg("Decode list item: " + elem.getName());
+		}
+
+		return null;
+
+	}
+
 	protected Object createMemberObject(JSONElement elem)
 			throws ClassNotFoundException {
 
@@ -186,12 +233,12 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 			Object deserializedInstance = deserialized.newInstance();
 
-			Map<String, Object> innerTypes = elem.getInnerTypes();
+			Map<String, Object> innerTypes = elem.getAsMap();
 
 			if (innerTypes != null) {
 
 				ArrayList<JSONElement> members = decodeHashMapKeys((Map<String, Object>) elem
-						.getInnerTypes());
+						.getAsMap());
 
 				for (JSONElement jsonElement : members) {
 
@@ -303,19 +350,10 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 			Object inner = map.get(full_string);
 
-			if (inner instanceof Map<?, ?>) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> innerTypes = (Map<String, Object>) inner;
+			// @SuppressWarnings("unchecked")
+			// Map<String, Object> innerTypes = (Map<String, Object>) inner;
 
-				tmp.add(new JSONElement(name, type, innerTypes));
-				
-			} else {
-				
-				JSONElement tmp2 = new JSONElement(name, type, null);
-				tmp2.setObject(inner);
-				tmp.add(tmp2);
-				
-			}
+			tmp.add(new JSONElement(name, type, inner));
 
 		}
 
