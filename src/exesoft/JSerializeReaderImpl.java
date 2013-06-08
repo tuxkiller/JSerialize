@@ -18,6 +18,8 @@ import java.util.Set;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
+import sun.font.CreatedFontTracker;
+
 /**
  * 
  * JSerializeReader - Klasa odpowiedzialna za odwzorowanie obiektu na podstawie
@@ -72,6 +74,10 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			return type;
 		}
 
+		public void setType(String newtype) {
+			type = newtype;
+		}
+
 		public Map<String, Object> getAsMap() {
 			return (Map<String, Object>) innerTypes;
 		}
@@ -82,6 +88,10 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 		public String getStringWithHash() {
 			return new String(name + '#' + type);
+		}
+		
+		public Object get(){
+			return innerTypes;
 		}
 
 	}
@@ -128,55 +138,13 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 		dbg("Class name: " + rootClass.getType());
 
-		try {
-			deserialized = Class.forName(rootClass.getType());
-
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		deserializedObject = null;
 
 		try {
-			deserializedObject = deserialized.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			deserializedObject = createObject(rootClass);
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-		try {
-
-			ArrayList<JSONElement> members = decodeHashMapKeys(rootClass
-					.getAsMap());
-
-			for (JSONElement jsonElement : members) {
-				dbg("Deserializing member: " + jsonElement.getType() + " "
-						+ jsonElement.getName());
-				// dbg("Member contents: " )
-				Field field = deserialized.getDeclaredField(jsonElement
-						.getName());
-				field.setAccessible(true);
-
-				Class<?> c = field.getType();
-
-				if (c.getName().equals(List.class.getName())) {
-
-					List l = decodeList(jsonElement, field);
-
-				}
-				// tmp.set(deserializedObject, );
-
-				ArrayList<JSONElement> inner = decodeHashMapKeys(jsonElement
-						.getAsMap());
-				dbg(" ");
-
-			}
-
-		} catch (NoSuchFieldException | SecurityException
-				| IllegalArgumentException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 
 		return deserializedObject;
@@ -191,10 +159,13 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		}
 	}
 
-	protected static List decodeList(JSONElement encoded, Field field) {
+	@SuppressWarnings("unchecked")
+	protected List decodeList(JSONElement encoded, Field field) {
 
-		ArrayList<JSONElement> elems = decodeHashMapKeys((Map<String, Object>) encoded
+		ArrayList<JSONElement> elementDataArr = decodeHashMapKeys((Map<String, Object>) encoded
 				.getAsMap());
+
+		JSONElement elementData = elementDataArr.get(0);
 
 		Type type = field.getGenericType();
 
@@ -202,53 +173,105 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 		Type t = pt.getActualTypeArguments()[0];
 		String tmp = t.toString();
-		
+
 		int space = tmp.indexOf(' ');
-		
-		String name = tmp.substring(space, tmp.length());
+
+		String className = tmp.substring(space+1, tmp.length());
 
 		if (debug) {
-			dbg("Name: " + name);
+			dbg("Name: " + className);
 			System.out.println("type: " + type);
 			System.out.println("raw type: " + pt.getRawType());
-			System.out.println("actual type args:");
 
 		}
+
+		ArrayList<JSONElement> elems = new ArrayList<>();
+
+		List<HashMap<String, Object>> hashmaps = elementData.getAsList();
 		List returnList = new ArrayList<>();
+		try {
+			for (HashMap map : hashmaps) {
 
-		for (JSONElement elem : elems) {
-			dbg("Decode list item: " + elem.getName());
+				JSONElement object = new JSONElement("elementData", className,
+						decodeHashMapKeys(map));
+
+				returnList.add(createObject(object));
+//				dbg("Decode list item: " + elem.getName());
+
+
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		return null;
+//		for (JSONElement elem : elems) {
+//			try {
+//				Object obj = createObject(elem);
+//				returnList.add(obj);
+//			} catch (ClassNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			dbg("Decode list item: " + elem.getName());
+//		}
+
+		return returnList;
 
 	}
 
-	protected Object createMemberObject(JSONElement elem)
+	protected Object createObject(JSONElement elem)
 			throws ClassNotFoundException {
 
 		try {
+
+			switch (elem.getType()) {
+			case "intArray":
+			case "value":
+				return elem.getAsList();
+			case "0":
+				return "0";
+
+			}
 
 			Class deserialized = Class.forName(elem.getType());
 
 			Object deserializedInstance = deserialized.newInstance();
 
-			Map<String, Object> innerTypes = elem.getAsMap();
+			Object innerTypes = elem.get();
 
 			if (innerTypes != null) {
 
-				ArrayList<JSONElement> members = decodeHashMapKeys((Map<String, Object>) elem
-						.getAsMap());
+				ArrayList<JSONElement> members = null;
+				
+				if (innerTypes instanceof Map<?,?>)
+					members = decodeHashMapKeys((Map<String, Object>) innerTypes);
+				else if (innerTypes instanceof List) {
+					members = (ArrayList<JSONElement>) innerTypes;
+				}
 
 				for (JSONElement jsonElement : members) {
-
-					Field tmp = deserialized.getDeclaredField(jsonElement
+					dbg("Deserializing member: " + jsonElement.getType() + " "
+							+ jsonElement.getName());
+					// dbg("Member contents: " )
+					Field field = deserialized.getDeclaredField(jsonElement
 							.getName());
-					tmp.setAccessible(true);
+					field.setAccessible(true);
 
-					// if (jsonElement.getInnerTypes().s)
+					Class<?> c = field.getType();
 
+					if (c.getName().equals(List.class.getName())) {
+
+						List l = decodeList(jsonElement, field);
+						field.set(deserializedObject, l);
+
+					}
 					// tmp.set(deserializedObject, );
+
+					ArrayList<JSONElement> inner = decodeHashMapKeys((Map<String, Object>) jsonElement
+							.get());
+					dbg(" ");
+
 				}
 
 			} else {
@@ -259,7 +282,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			return deserializedInstance;
 
 		} catch (ClassNotFoundException e) {
-			throw new ClassNotFoundException("Class " + elem.getName()
+			throw new ClassNotFoundException("Class " + elem.getType()
 					+ "not found!\n");
 		} catch (NoSuchFieldException e) {
 			// TODO Auto-generated catch block
@@ -339,6 +362,15 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			int hash_index = full_string.indexOf('#');
 
 			if (hash_index == -1) {
+
+				if (full_string.equals("0")) {
+					Object inner = map.get(full_string);
+					if (((String) inner).equals("0")) {
+						tmp.add(new JSONElement("0", "0", null));
+						continue;
+					}
+				}
+
 				throw new java.security.InvalidParameterException('"'
 						+ full_string + '"'
 						+ " doesn't contain a hash (#) in hashmap name: \n"
