@@ -9,6 +9,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -89,8 +90,8 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		public String getStringWithHash() {
 			return new String(name + '#' + type);
 		}
-		
-		public Object get(){
+
+		public Object getInner() {
 			return innerTypes;
 		}
 
@@ -176,7 +177,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 		int space = tmp.indexOf(' ');
 
-		String className = tmp.substring(space+1, tmp.length());
+		String className = tmp.substring(space + 1, tmp.length());
 
 		if (debug) {
 			dbg("Name: " + className);
@@ -192,12 +193,14 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		try {
 			for (HashMap map : hashmaps) {
 
-				JSONElement object = new JSONElement("elementData", className,
-						decodeHashMapKeys(map));
+				if (map.get("0") == null) {
+					JSONElement object = new JSONElement("elementData",
+							className, decodeHashMapKeys(map));
 
-				returnList.add(createObject(object));
-//				dbg("Decode list item: " + elem.getName());
-
+					if (object != null)
+						returnList.add(createObject(object));
+					// dbg("Decode list item: " + elem.getName());
+				}
 
 			}
 		} catch (ClassNotFoundException e) {
@@ -205,19 +208,27 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			e.printStackTrace();
 		}
 
-//		for (JSONElement elem : elems) {
-//			try {
-//				Object obj = createObject(elem);
-//				returnList.add(obj);
-//			} catch (ClassNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			dbg("Decode list item: " + elem.getName());
-//		}
+		// for (JSONElement elem : elems) {
+		// try {
+		// Object obj = createObject(elem);
+		// returnList.add(obj);
+		// } catch (ClassNotFoundException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// dbg("Decode list item: " + elem.getName());
+		// }
 
 		return returnList;
 
+	}
+
+	private int[] toIntArray(List<Integer> list) {
+		int[] ret = new int[list.size()];
+		int i = 0;
+		for (Integer e : list)
+			ret[i++] = e.intValue();
+		return ret;
 	}
 
 	protected Object createObject(JSONElement elem)
@@ -227,10 +238,16 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 			switch (elem.getType()) {
 			case "intArray":
-			case "value":
-				return elem.getAsList();
+				// return elem.getInner();
+				int[] tmp = toIntArray((List<Integer>) elem.getInner());
+				return Arrays.copyOf(tmp, tmp.length);
+			case "charArray":
+				return elem.getInner();
 			case "0":
 				return "0";
+				// // case "java.lang.String":
+				// // return
+				//
 
 			}
 
@@ -238,13 +255,13 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 			Object deserializedInstance = deserialized.newInstance();
 
-			Object innerTypes = elem.get();
+			Object innerTypes = elem.getInner();
 
 			if (innerTypes != null) {
 
 				ArrayList<JSONElement> members = null;
-				
-				if (innerTypes instanceof Map<?,?>)
+
+				if (innerTypes instanceof Map<?, ?>)
 					members = decodeHashMapKeys((Map<String, Object>) innerTypes);
 				else if (innerTypes instanceof List) {
 					members = (ArrayList<JSONElement>) innerTypes;
@@ -260,16 +277,39 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 					Class<?> c = field.getType();
 
-					if (c.getName().equals(List.class.getName())) {
+					// Object deser = createObject(jsonElement);
+
+					if (jsonElement.getType().equals(List.class.getName())) {
 
 						List l = decodeList(jsonElement, field);
-						field.set(deserializedObject, l);
+						field.set(deserializedInstance, l);
+					} else if (jsonElement.getType().equals(
+							String.class.getName())) {
 
+						ArrayList<JSONElement> tmp = decodeHashMapKeys(jsonElement
+								.getAsMap());
+						List inner = (List) createObject(tmp.get(0));
+
+						StringBuilder sb = new StringBuilder(inner.size());
+						for (Object c_ : inner)
+							sb.append(c_);
+						String result = sb.toString();
+
+						String value = result;
+
+						field.set(deserializedInstance, value);
+					} else {
+
+						Object tmp = createObject(jsonElement);
+
+						field.set(deserializedInstance, tmp);
+						dbg("else");
+						// ArrayList<JSONElement> inner =
+						// decodeHashMapKeys((Map<String, Object>) jsonElement
+						// .getInner());
 					}
 					// tmp.set(deserializedObject, );
 
-					ArrayList<JSONElement> inner = decodeHashMapKeys((Map<String, Object>) jsonElement
-							.get());
 					dbg(" ");
 
 				}
