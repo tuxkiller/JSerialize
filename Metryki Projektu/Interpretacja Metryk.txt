@@ -30,7 +30,7 @@ Metod").
 ~~~~~
 [3]. [Number of Children (NSC)]:
   Liczba podklas bezposrednich (ew. posrednich). 
-Dla package-u jest to liczba podpackage-ow.
+Dla package'u jest to liczba podpackage'ow.
 Wartosc metryki okresla szerokosc hierarchii 
 dziedziczenia. Zbyt duza wartosc tej metryki 
 moze swiadczyc o nieprawidlowo zastosowanym 
@@ -46,7 +46,7 @@ analizowanym zakresie.
 
 ~~~~~
 [5]. [Method Lines of Code (MLOC)]:
-  Iloœæ linii kodu, z ktorych skladaja sie
+  Ilosc linii kodu, z ktorych skladaja sie
 ciala metod. W tej wartosci nie sa 
 uwzgledniane puste linie i komentarze.
 
@@ -63,7 +63,7 @@ obiektowa dekompozycje.
 
 ~~~~~
 [7]. [Nested Block Depth (NBD)]:
-  G³êbokosc zagniezdzenia blokow kodu.
+  Glebokosc zagniezdzenia blokow kodu.
 Zbyt duza wartosc metryki moze 
 wskazywac na szacunkowo zbyt duze 
 skomplikowanie kodu.
@@ -200,7 +200,7 @@ na zle zaprojektowana klase.
 
 ~~~~~
 [20]. [Abstractness (A)]:
-  Miara abstrakcyjnoœci package'u. Jest to liczba 
+  Miara abstrakcyjnosci package'u. Jest to liczba 
 abstrakcyjnych klas oraz interface'ow podzielona 
 przez liczbe wszystkich typow w package'u. Wartosci
 metryki wahaja sie w zakresie 0-1. Nie mozna 
@@ -210,8 +210,8 @@ przeznaczenia konkretnych package'ow.
 ~~~~~
 [21]. [Specialization Index (SIX)]:
   Metryka jest procentowa wartoscia wyrazana poprzez 
-rownanie NORM * DIT / NOM. Wysoki wynik mo¿e wskazywac 
-na zbyt du¿¹ liczbê przedefiniowanych metod, a to z kolei 
+rownanie NORM * DIT / NOM. Wysoki wynik moze wskazywac 
+na zbyt duza liczbe przedefiniowanych metod, a to z kolei 
 utrudnia zrozumienie projektu. 
 Dla klasy glownej (root) wartosc metryki wynosi 0.
 
@@ -219,21 +219,21 @@ Dla klasy glownej (root) wartosc metryki wynosi 0.
 
 ~~~~~
 [22]. [Weighted Methods per Class (WMC)]:
-  Usrednione metody na klase. Metryka mierzy z³o¿onoœæ 
-klasy. Jej wartosc jest sum¹ z³o¿onoœci cyklomatycznych 
+  Usrednione metody na klase. Metryka mierzy zlozonosc 
+klasy. Jej wartosc jest suma zlozonosci cyklomatycznych 
 McCabe'a wszystkich metod w analizowanej klasie.
 
 >Zalecane: 0-100
 
 ~~~~~
 [23]. [Number of Static Atributes (NSF)]:
-  Liczba statycznych atrybutów w danym,
+  Liczba statycznych atrybutow w danym,
 analizowanym zakresie.
 
 ______________________________________________________________________
 Wartosci zalecane sa umowne i moga byc rozne w zaleznosci od projektu.
 
-*"stopniem spe³nienia w³asnoœci jakoœci jednostki oprogramowania"
+*"stopniem spelnienia wlasnosci jakosci jednostki oprogramowania"
 -wynika ze standardu IEEE 1061-1998
 ______________________________________________________________________
 Zrodla: 
