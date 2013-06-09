@@ -4,8 +4,10 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.Boolean;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +28,11 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 		fieldsToConsider.put(List.class.getName(), "elementData");
 		fieldsToConsider.put(ArrayList.class.getName(), "elementData");
 		fieldsToConsider.put(Boolean.class.getName(), "valueboolean");
+		fieldsToConsider.put(ArrayDeque.class.getName(), "elements");
+		fieldsToConsider.put(HashMap.class.getName(), "table");
+		fieldsToConsider.put(LinkedList.class.getName(), "first,next,prev");
+		
+//		fieldsToConsider.put(LinkedList.class.getName()+"#Node", "first,next,prev");
 		// ADD MORE COMMON TYPES USED IN JAVA AND THEIR FIELDS
 	}
 
@@ -52,13 +59,13 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 			setPublic(field);
 			Object value;
 			
-			if (ob instanceof List) {
+			if (ob instanceof List || ob instanceof Map || ob instanceof LinkedList ||  getTypeName(field).equals("java.util.LinkedList$Node")) {
 				if(shouldISkipThisField(c, field, false)) continue;
 			} else
-			if (shouldISkipThisField(c, field,true)){
+			if (shouldISkipThisField(c, field, true)){
 				continue;
 			}
-
+			
 			try {
 				value = field.get(ob);
 			} catch (Exception e1) {
@@ -72,7 +79,6 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 				int valueHash = System.identityHashCode(value);
 				String hashString = Integer.toString(valueHash);
 				String typeName = getTypeName(field);
-
 				if (typeName.startsWith("[I")) {
 					List<Integer> lista = new ArrayList<Integer>();
 					for (int i = 0; i < ((int[]) value).length; i++) {
@@ -158,17 +164,43 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 				}
 
 				if (typeName.startsWith("[L")) {
+					
+					
+					if(ob instanceof Map){
+						Map<Object,Object> mapa = new HashMap<Object,Object>();
+						
+						@SuppressWarnings({ "unchecked", "rawtypes" })
+						Iterator<Entry<Object, Object>> it = ((Map)ob).entrySet().iterator();
+						while (it.hasNext()) {
+							@SuppressWarnings("rawtypes")
+							Map.Entry pairs = (Map.Entry) it.next();
+							mapa.put(pairs.getKey().toString(), toMap(pairs.getValue()));
+							it.remove();
+						}
+						if (knownHashes.containsKey(hashString)) {
+							map.put(field.getName() +"#"+getTypeName(field), knownHashes.get(hashString));
+						} else {
+							knownHashes.put(hashString, field.getName());
+							map.put(field.getName() +"#"+getTypeName(field) +"Array", mapa);
+						}
+						
+						continue;
+					} else {
+					
 					List<Object> lista = new ArrayList<Object>();
+					
 					for (int i = 0; i < ((Object[]) value).length; i++) {
-						String type = ((Object[]) value)[0].getClass()
-								.getName();
+
 						try {
+							String type = ((Object[]) value)[0].getClass()
+									.getName();
 							lista.add(toMap((Class.forName(type)
 									.cast(((Object[]) value)[i]))));
 						} catch (ClassNotFoundException e) {
 							e.printStackTrace();
+						} catch (NullPointerException e){
 						}
-					}
+					}					
 					if (knownHashes.containsKey(hashString)) {
 						map.put(field.getName() +"#"+getTypeName(field), knownHashes.get(hashString));
 					} else {
@@ -176,6 +208,7 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 						map.put(field.getName() +"#"+getTypeName(field) +"Array", lista);
 					}
 					continue;
+					}					
 				}
 
 				if (knownHashes.containsKey(hashString)) {
@@ -238,7 +271,6 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 			Field field, boolean checkTransient) {
 		boolean shouldI = true;
 		String s = new String();
-		
 		if ((s = fieldsToConsider.get(c.getName())) != null) {
 			
 			if (s.contains(field.getName())){
