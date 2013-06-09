@@ -1,0 +1,35 @@
+Chodzi o ogólny zarys testów dorycz¹cych seralizacacji (encode)
+
+Niektóre testy moga byæ zbedne lub zawieraæ siê w innych, ale to narazie prognozy 
+
+OBIEKT
+1,2: skoro obiekt jest zbiorem par (nazwa:wartoœæ) to warto by sprawdziæ czy poprawnie siê je tworzy tzn. sprawdziæ czy niema takich przypadków jak:
+	1) nazwa:null(brak wartoœci), 
+	2) null(brak nazwy):wartoœæ
+3: sprawdzenie czy w pliku koncowym json jest poprawny znak miedzu nazwa a wartoœæ, czyli ':'
+4: czy miedzy parami wyst¹pi popr. znak ',' (przecinek)
+5: sprawdzanie typu wartoœæi
+6: spr tworzenie klamr {}
+
+ARRAY
+7: spr typu wartoœci w tablic
+8: Spr czy w tablicach miedzy wartosciami poprawnie wyst¹pi¹ przecinki 
+9: czy znakami okreslaj¹ce pocz i koniec tabli to znkali '[' oraz ']'
+
+VALUE
+10: spawdz typu wartosci
+11:sprawdzanie poprawnosci w typach:
+11.1:String
+	11.1.a:spr czy string s¹ w cudzys³owach
+	11.1.b:spr poprawnosci znaków po '\' dla przypadków: \",\\,\/,\b,\f,\n,\r,\t,\u
+	11.1.c:sprawdzanie poprawnoœci dla znaków hex: [\u][4znaki z zakresu 0-9,A-F] (\u10A6)
+	11.1.d:sprawdz. czy s¹ obecne znaki inne ni¿ unicode
+11.2:number
+	11.2.a:czy pierwsz¹ liczb¹ nie jest 0
+	11.2.b:sprawdzanie obecnoœci kropki przy liczbach u³amkowych
+	11.2.c:sprawdznie czy nie ma obecnych liter, gdzyz oznacza³o by to forman inny ni¿ system dzieci¹tkowy
+	11.2.d:poprawnoœæ "liczb wielkich' tych z ena koñcu( 2165489e+100) - do ogarniêcia :D
+11.3:object
+11.4:array
+11.5:bolean- true/false
+11.6:null
