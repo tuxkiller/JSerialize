@@ -3,6 +3,7 @@ package exesoft;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.Boolean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 		fieldsToConsider.put(String.class.getName(), "value");
 		fieldsToConsider.put(List.class.getName(), "elementData");
 		fieldsToConsider.put(ArrayList.class.getName(), "elementData");
+		fieldsToConsider.put(Boolean.class.getName(), "valueboolean");
 		// ADD MORE COMMON TYPES USED IN JAVA AND THEIR FIELDS
 	}
 
@@ -64,7 +66,7 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 			}
 
 			if (isPrimitive(field)) {
-				map.put(field.getName() + getTypeName(field), value);
+				map.put(field.getName() + "#" + getTypeName(field), value);
 			} else {
 
 				int valueHash = System.identityHashCode(value);
@@ -81,6 +83,62 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 					} else {
 						knownHashes.put(hashString, field.getName());
 						map.put(field.getName() +"#intArray", lista);
+					}
+					continue;
+				}
+				
+				if (typeName.startsWith("[S")) {
+					List<Short> lista = new ArrayList<Short>();
+					for (int i = 0; i < ((short[]) value).length; i++) {
+						lista.add((Short) (((short[]) value))[i]);
+					}
+					if (knownHashes.containsKey(hashString)) {
+						map.put(field.getName() +"#shortArray", knownHashes.get(hashString));
+					} else {
+						knownHashes.put(hashString, field.getName());
+						map.put(field.getName() +"#shortArray", lista);
+					}
+					continue;
+				}
+				
+				if (typeName.startsWith("[B")) {
+					List<Boolean> lista = new ArrayList<Boolean>();
+					for (int i = 0; i < ((boolean[]) value).length; i++) {
+						lista.add((Boolean) (((boolean[]) value))[i]);
+					}
+					if (knownHashes.containsKey(hashString)) {
+						map.put(field.getName() +"#booleanArray", knownHashes.get(hashString));
+					} else {
+						knownHashes.put(hashString, field.getName());
+						map.put(field.getName() +"#booleanArray", lista);
+					}
+					continue;
+				}
+				
+				if (typeName.startsWith("[J")) {
+					List<Long> lista = new ArrayList<Long>();
+					for (int i = 0; i < ((long[]) value).length; i++) {
+						lista.add((Long) (((long[]) value))[i]);
+					}
+					if (knownHashes.containsKey(hashString)) {
+						map.put(field.getName() +"#longArray", knownHashes.get(hashString));
+					} else {
+						knownHashes.put(hashString, field.getName());
+						map.put(field.getName() +"#longArray", lista);
+					}
+					continue;
+				}
+				
+				if (typeName.startsWith("[F")) {
+					List<Float> lista = new ArrayList<Float>();
+					for (int i = 0; i < ((float[]) value).length; i++) {
+						lista.add((Float) (((float[]) value))[i]);
+					}
+					if (knownHashes.containsKey(hashString)) {
+						map.put(field.getName() +"#floatArray", knownHashes.get(hashString));
+					} else {
+						knownHashes.put(hashString, field.getName());
+						map.put(field.getName() +"#floatArray", lista);
 					}
 					continue;
 				}
@@ -184,7 +242,6 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 		if ((s = fieldsToConsider.get(c.getName())) != null) {
 			
 			if (s.contains(field.getName())){
-				System.out.println(field.getName());
 				shouldI = false;
 			}
 			else
