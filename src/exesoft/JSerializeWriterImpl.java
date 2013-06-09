@@ -11,16 +11,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import java.util.Iterator;
 
 public class JSerializeWriterImpl implements JSerializeWriter {
 
 	static Map<String, String> knownHashes = new HashMap<String, String>();
-
+	
 	Map<String, String> aliases = new HashMap<String, String>(); // to be
 																	// considered
-
 	Map<String, String> fieldsToConsider = new HashMap<String, String>();
 
 	public JSerializeWriterImpl() {
@@ -31,6 +31,8 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 		fieldsToConsider.put(ArrayDeque.class.getName(), "elements");
 		fieldsToConsider.put(HashMap.class.getName(), "table");
 		fieldsToConsider.put(LinkedList.class.getName(), "first,next,prev");
+		fieldsToConsider.put(TreeMap.class.getName(), "root,parent,right,left");
+		fieldsToConsider.put(TreeMap.class.getName()+"$Entry", "root,parent,right,left,key,value");
 		
 //		fieldsToConsider.put(LinkedList.class.getName()+"#Node", "first,next,prev");
 		// ADD MORE COMMON TYPES USED IN JAVA AND THEIR FIELDS
@@ -247,6 +249,8 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 
 	@Override
 	public boolean writeObject(OutputStream os) {
+		
+		
 
 		return false;
 	}
