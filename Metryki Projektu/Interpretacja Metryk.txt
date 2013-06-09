@@ -1,0 +1,243 @@
+    Metryki oprogramowania okreslaja w sposob
+liczbowy specyfikacje, charakterystyke danego 
+projektu. Wartosc ta jest "stopniem spelnienia 
+wlasnosci jakosci jednostki oprogramowania"*.
+
+________________________________________________
+~~Znaczenie poszczegolnych metryk, ktore mozna~~
+      odczytac z raportu plug-inu Metrics:
+~~~~~
+[1]. [Number of Overridden Methods (NOOM)]:
+  Liczba przeciazonych metody z nadklasy. 
+Nadmierna ilosc modyfikacji takich metod 
+moze swiadczyc o przesadnej roznicy pomiedzy 
+dana klasa bazowa, a jej pochodna, co w 
+efekcie powoduje utrate sensu dziedziczenia 
+
+>Zalecane: 0-5
+
+~~~~~
+[2]. [Number of Attributes (NOA)]:
+  Metryka ta sluzy do zliczania sredniej liczby 
+atrybutow klasy. Jest to uzyteczna informacja
+przy wskazywaniu niedostatecznej dekompozycji
+klasy (gdy wartosc tej metryki przekracza 10, 
+przy rownie wysokiej wartosci metryki "Liczba 
+Metod").
+
+>Zalecane: 2-5
+
+~~~~~
+[3]. [Number of Children (NSC)]:
+  Liczba podklas bezposrednich (ew. posrednich). 
+Dla package-u jest to liczba podpackage-ow.
+Wartosc metryki okresla szerokosc hierarchii 
+dziedziczenia. Zbyt duza wartosc tej metryki 
+moze swiadczyc o nieprawidlowo zastosowanym 
+mechanizmie dziedziczenia co z kolei utrudnia 
+testowanie danej klasy.
+
+>Zalecane: 1-4
+
+~~~~~
+[4]. [Number of Classes (NOC)]:
+  Liczba klas w danym, 
+analizowanym zakresie.
+
+~~~~~
+[5]. [Method Lines of Code (MLOC)]:
+  Iloœæ linii kodu, z ktorych skladaja sie
+ciala metod. W tej wartosci nie sa 
+uwzgledniane puste linie i komentarze.
+
+>Zalecane: Ponizej 50.
+
+~~~~~
+[6]. [Number of Methods (NOM)]:
+  Liczba metod zdefiniowanych w danym, 
+analizowanym zakresie. Przy zbyt duzej
+wartosci metryki zaleca sie dalsza
+obiektowa dekompozycje.
+
+>Zalecane: Ponizej 20.
+
+~~~~~
+[7]. [Nested Block Depth (NBD)]:
+  G³êbokosc zagniezdzenia blokow kodu.
+Zbyt duza wartosc metryki moze 
+wskazywac na szacunkowo zbyt duze 
+skomplikowanie kodu.
+
+~~~~~
+[8]. [Depth of Inheritance Tree (DIT)]:
+  Okresla pozycje (glebokosc osadzenia) 
+klas w drzewie dziedziczenia. W dziedziczeniu 
+wielokrotnym wartoscia jest najdluzsza sciezka 
+do korzenia (klasa Object). Duza wartosc tej 
+metryki wskazuje na slaba hermetyzacje i 
+wzrost zlozonosci.
+-Interface: glebokosc = 1
+-Klasa java.lang.Object: glebokosc = 0
+-Inne klasy: glebokosc = 1 + glebokosc nadklasy
+
+>Zalecane: 0-5
+
+~~~~~
+[9]. [Number of Packages (NOP)]:
+  Liczba package'ow w danym, 
+analizowanym zakresie.
+
+~~~~~
+[10]. [Afferent Coupling (Ca)]:
+  Metryka ta okresla liczbe klas i interface'ow 
+z innych package'ow, ktore sa zalezne od klas 
+w analizowanym package'u. Im wieksza jest 
+wartosc tej metryki, tym wieksza odpowiedzialnoscia
+jest obciazona dana klasa. To z kolei powoduje,
+ze modyfikacje w niej wymusza modyfikacje klas
+zaleznych.
+
+>Zalecane: Nie wiecej niz 500. Im mniej, tym lepiej.
+
+~~~~~
+[11]. [Number of Interfaces (NOI)]:
+  Liczba interface'ow w danym,
+analizowanym zakresie.
+
+~~~~~
+[12]. [McCabe Cyclomatic Complexity (MCC)]:
+  Cyklomatyczna metryka zlozonosci McCabe'a.
+Jest to wartosc charakteryzujaca funkcje lub metode
+i okreslajaca jej poziom skomplikowania.
+Ilosc niezaleznych sciezek przebiegu programu.
+Inkrementacja wartosci metryki wystepuje przy
+kazdym wystapieniu nastepujacych rozgalezien: if, 
+for, while, do, case, operatora '?', a takze 
+operatorow logicznych '||' oraz '&&' (obliczane
+tylko dla metod).
+Niska wartosc wskazuje na latwosc zrozumienia funkcji
+lub metody. Zbyt duza liczba (powyzej 20) oznacza 
+duza zlozonosc kodu metody i sygnalizuje wysoki 
+stopien zagrozenia wystapieniem bledow. 
+
+>Zalecane: Ponizej 10
+
+~~~~~
+[13]. [Total lines of code (TLOC)]:
+  Ilosc lini kodu w danym,
+analizowanym zakresie. Metryka uwzglednia puste
+linie oraz komentarze.
+
+>Zalecane: Ponizej 750 (na klase).
+
+~~~~~
+[14]. [Instability (I)]:
+  Metryka niestabilnosci okresla podatnosc na 
+zmiany w danym komponencie. Jej wartosci 
+wahaja sie w zakresie od 0 (mala podatnosc na 
+zmiany w zewnetrznych modulach) do 1 (klasa
+jest podatna na zmiany w zewnetrznych modulach). 
+Komponenty stabilne posiadaja wyniki mieszczace 
+sie w przedziale 0-0.3, natomiast komponenty
+niestabilne to wartosci w zakresie 0.7-1.
+Package jest niestabilny, gdy jest bardziej
+zalezny od innych package'ow, niz one od niego.
+
+>Zalecane: ~0 lub 1. Zaleznie od przeznacznia
+package'u - niektore musza byc niestabilne, 
+niektore musza byc stabilne.
+
+~~~~~
+[15]. [Number of Parameters (PAR)]:
+  Liczba parametrow w danym,
+analizowanym zakresie. Zliczane sa parametry
+zarowno metod jak i konstruktorow. Metody z 
+duza liczba parametrow sa klopotliwe w
+ponownym ich wykorzystaniu.
+
+>Zalecane: Ponizej 6.
+
+~~~~~
+[16]. [Lack of Cohesion of Methods (LCOM*)]:
+  Jest to metryka okreslajaca spojnosc lub jej brak
+w wypadku analizowanych klas. Klasy (jej metody) 
+powinny pelnic scisle okreslone funkcje (realizowac
+podobne cele). Brak spojnosci informuje nas, ze dana 
+klasa wykonuje wiecej funkcji i powinno sie ja podzielic 
+w celu zapewnienia poprawnej hermetyzacji.
+
+>Zalecane: 0
+
+~~~~~
+[17]. [Efferent Coupling (Ce)]:
+  Metryka ta okresla liczbe klas i interface'ow 
+w analizowanym package'u, ktore sa zalezne od klas 
+poza tym packagem. Zmiany w innych klasach moga
+znacznie oddzialywac na prace analizowanej klasy. 
+Wyzsze wartosci metryki oznaczaja niestabilnosc 
+danego package'u oraz problemy dotyczace rozwoju 
+okreslonego komponentu.
+
+>Zalecane: 0-20
+
+~~~~~
+[18]. [Number of Static Methods (NSM)]:
+  Liczba metod statycznych w danym,
+analizowanym zakresie.
+
+~~~~~
+[19]. [Normalized Distance from Main Sequence (Dn)]
+  Znormalizowany dystans od ciagu glownego. Wartosc
+ta okresla poziom zaburzenia rownowagi miedzy
+poziomami abstrakcyjnosci oraz niestabilnosci.
+Klasy bedace klasami abstrakcyjnymi powinny posiadac
+ceche stabilnosci, natomiast niestabilne klasy
+powinny byc konkretne. Wartosc metryki przedstawia 
+odchylenie od tej reguly. Wynik 0,2 wskazywac moze
+na zle zaprojektowana klase.
+
+>Zalecane: 0
+
+~~~~~
+[20]. [Abstractness (A)]:
+  Miara abstrakcyjnoœci package'u. Jest to liczba 
+abstrakcyjnych klas oraz interface'ow podzielona 
+przez liczbe wszystkich typow w package'u. Wartosci
+metryki wahaja sie w zakresie 0-1. Nie mozna 
+wyznaczyc wartosci zalecanych, gdyz sa zalezne od
+przeznaczenia konkretnych package'ow.
+
+~~~~~
+[21]. [Specialization Index (SIX)]:
+  Metryka jest procentowa wartoscia wyrazana poprzez 
+rownanie NORM * DIT / NOM. Wysoki wynik mo¿e wskazywac 
+na zbyt du¿¹ liczbê przedefiniowanych metod, a to z kolei 
+utrudnia zrozumienie projektu. 
+Dla klasy glownej (root) wartosc metryki wynosi 0.
+
+>Zalecane: 0-120%
+
+~~~~~
+[22]. [Weighted Methods per Class (WMC)]:
+  Usrednione metody na klase. Metryka mierzy z³o¿onoœæ 
+klasy. Jej wartosc jest sum¹ z³o¿onoœci cyklomatycznych 
+McCabe'a wszystkich metod w analizowanej klasie.
+
+>Zalecane: 0-100
+
+~~~~~
+[23]. [Number of Static Atributes (NSF)]:
+  Liczba statycznych atrybutów w danym,
+analizowanym zakresie.
+
+______________________________________________________________________
+Wartosci zalecane sa umowne i moga byc rozne w zaleznosci od projektu.
+
+*"stopniem spe³nienia w³asnoœci jakoœci jednostki oprogramowania"
+-wynika ze standardu IEEE 1061-1998
+______________________________________________________________________
+Zrodla: 
+[ang.] http://scvs.wikispaces.com/Early+Metrics
+[ang.] http://realsearchgroup.org/SEMaterials/tutorials/metrics/
+[ang.] http://staff.unak.is/andy/StaticAnalysis0809/metrics/overview.html
+[ang.] http://support.objecteering.com/objecteering6.1/help/us/metrics/toc.htm
