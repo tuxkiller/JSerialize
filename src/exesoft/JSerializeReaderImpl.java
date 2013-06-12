@@ -19,7 +19,7 @@ import java.util.Set;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
-import sun.font.CreatedFontTracker;
+
 
 /**
  * 
@@ -36,7 +36,7 @@ import sun.font.CreatedFontTracker;
 public class JSerializeReaderImpl implements JSerializeReader {
 
 	/**
-	 * Helper class for holding fields data
+	 * Helper class for holding fields data.
 	 * 
 	 * @author Micha³
 	 * 
@@ -98,18 +98,18 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	}
 
 	/**
-	 * class member holding the deserialized object
+	 * Class member holding the deserialized object.
 	 */
 	private Object deserializedObject;
 
 	/**
-	 * object hash map
+	 * Object hash map.
 	 * 
 	 */
 	private Map<String, Object> objectHashMap;
 
 	/**
-	 * Creates the object from hashmap using java reflection
+	 * Creates the object from hashmap using java reflection.
 	 * 
 	 * (non-Javadoc)
 	 * 
@@ -197,8 +197,9 @@ public class JSerializeReaderImpl implements JSerializeReader {
 					JSONElement object = new JSONElement("elementData",
 							className, decodeHashMapKeys(map));
 
-					if (object != null)
+					if (object != null) {
 						returnList.add(createObject(object));
+					}
 					// dbg("Decode list item: " + elem.getName());
 				}
 
@@ -226,8 +227,9 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	private int[] toIntArray(List<Integer> list) {
 		int[] ret = new int[list.size()];
 		int i = 0;
-		for (Integer e : list)
+		for (Integer e : list) {
 			ret[i++] = e.intValue();
+		}
 		return ret;
 	}
 
@@ -261,9 +263,9 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 				ArrayList<JSONElement> members = null;
 
-				if (innerTypes instanceof Map<?, ?>)
-					members = decodeHashMapKeys((Map<String, Object>) innerTypes);
-				else if (innerTypes instanceof List) {
+				if (innerTypes instanceof Map<?, ?>) {
+					members = decodeHashMapKeys((Map<String, Object>)innerTypes);
+				} else if (innerTypes instanceof List) {
 					members = (ArrayList<JSONElement>) innerTypes;
 				}
 
@@ -286,13 +288,15 @@ public class JSerializeReaderImpl implements JSerializeReader {
 					} else if (jsonElement.getType().equals(
 							String.class.getName())) {
 
-						ArrayList<JSONElement> tmp = decodeHashMapKeys(jsonElement
+						ArrayList<JSONElement> tmp = decodeHashMapKeys(
+								jsonElement
 								.getAsMap());
 						List inner = (List) createObject(tmp.get(0));
 
 						StringBuilder sb = new StringBuilder(inner.size());
-						for (Object c_ : inner)
+						for (Object c_ : inner) {
 							sb.append(c_);
+						}
 						String result = sb.toString();
 
 						String value = result;
@@ -375,9 +379,9 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 		objectHashMap = parser.decode(sbf.toString());
 
-		if (objectHashMap == null)
+		if (objectHashMap == null) {
 			return false;
-
+		}
 		return true;
 	}
 
@@ -422,8 +426,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 			Object inner = map.get(full_string);
 
-			// @SuppressWarnings("unchecked")
-			// Map<String, Object> innerTypes = (Map<String, Object>) inner;
+			
 
 			tmp.add(new JSONElement(name, type, inner));
 
