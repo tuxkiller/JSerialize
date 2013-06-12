@@ -33,7 +33,7 @@ import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
  * @author Micha³ Krakiewicz
  * 
  */
-public class JSerializeReaderImpl implements JSerializeReader {
+public final class JSerializeReaderImpl implements JSerializeReader {
 
 	/**
 	 * Helper class for holding fields data.
@@ -51,14 +51,14 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 		private boolean hasObject = false;
 
-		public JSONElement(String name, String type, Object innerTypes) {
+		public JSONElement(String name, String type, final Object innerTypes) {
 
 			this.name = name;
 			this.type = type;
 			this.innerTypes = innerTypes;
 		}
 
-		public void setObject(Object o) {
+		public void setObject(final Object o) {
 			innerObject = o;
 			hasObject = true;
 		}
@@ -75,7 +75,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			return type;
 		}
 
-		public void setType(String newtype) {
+		public void setType(final String newtype) {
 			type = newtype;
 		}
 
@@ -118,7 +118,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 	private static boolean debug = true;
 
-	private static void dbg(String msg) {
+	private static void dbg(final String msg) {
 
 		if (debug) {
 			System.err.println(msg);
@@ -129,7 +129,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	private static final String rootClassKey = "#JSerializeMetaData#RootClassName";
 
 	@Override
-	public Object fromMap(Map<String, Object> map) {
+	public Object fromMap(final Map<String, Object> map) {
 
 		dbg("Started creating object");
 
@@ -144,7 +144,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		try {
 			deserializedObject = createObject(rootClass);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 
@@ -152,7 +152,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 	}
 
-	public static <T> T convertInstanceOfObject(Object o, Class<T> clazz) {
+	public static <T> T convertInstanceOfObject(final Object o, final Class<T> clazz) {
 		try {
 			return clazz.cast(o);
 		} catch (ClassCastException e) {
@@ -161,7 +161,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected List decodeList(JSONElement encoded, Field field) {
+	protected List decodeList(final JSONElement encoded,final Field field) {
 
 		ArrayList<JSONElement> elementDataArr = decodeHashMapKeys((Map<String, Object>) encoded
 				.getAsMap());
@@ -205,7 +205,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+	
 			e.printStackTrace();
 		}
 
@@ -224,7 +224,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 
 	}
 
-	private int[] toIntArray(List<Integer> list) {
+	private int[] toIntArray(final List<Integer> list) {
 		int[] ret = new int[list.size()];
 		int i = 0;
 		for (Integer e : list) {
@@ -233,7 +233,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 		return ret;
 	}
 
-	protected Object createObject(JSONElement elem)
+	protected Object createObject(final JSONElement elem)
 			throws ClassNotFoundException {
 
 		try {
@@ -329,16 +329,16 @@ public class JSerializeReaderImpl implements JSerializeReader {
 			throw new ClassNotFoundException("Class " + elem.getType()
 					+ "not found!\n");
 		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 
@@ -352,7 +352,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	 * @see exesoft.JSerializeReader#readObject(java.io.InputStream)
 	 */
 	@Override
-	public Boolean readObject(InputStream input) {
+	public Boolean readObject(final InputStream input) {
 		JModel parser = new JModelImpl();
 
 		/**
@@ -386,7 +386,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	}
 
 	protected static ArrayList<JSONElement> decodeHashMapKeys(
-			Map<String, Object> map) {
+			final Map<String, Object> map) {
 
 		ArrayList<JSONElement> tmp = new ArrayList<>();
 
@@ -441,7 +441,7 @@ public class JSerializeReaderImpl implements JSerializeReader {
 	 * @return JSONElement with name of the class, and innerTypes contatinng the
 	 *         map withou class name
 	 */
-	protected static JSONElement processClassRoot(Map<String, Object> map) {
+	protected static JSONElement processClassRoot(final Map<String, Object> map) {
 		Object tmp = null;
 		tmp = map.get(rootClassKey);
 

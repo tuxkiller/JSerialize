@@ -2,17 +2,17 @@ package exesoft;
 
 import java.util.Map;
 
-public class JModelImpl implements JModel {
+public final class JModelImpl implements JModel {
 
   @Override
-	public String encode(Map<String, Object> toJson) {
-		// TODO Auto-generated method stub
+	public String encode(final Map<String, Object> toJson) {
+		
 		return null;
 	}
 
 	@Override
-	public Map<String, Object> decode(String fromJson) {
-		// TODO Auto-generated method stub
+	public Map<String, Object> decode(final String fromJson) {
+		
 		return null;
 	}
 
