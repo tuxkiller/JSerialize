@@ -44,6 +44,7 @@ private JModel parses = new JModelImpl();
 		fieldsToConsider.put(TreeMap.class.getName() + "$Entry",
 				"root,parent,right,left,key,value");
 		fieldsToConsider.put(HashSet.class.getName(), "map");
+		fieldsToConsider.put(Integer.class.getName(), "value");
 
 		// fieldsToConsider.put(LinkedList.class.getName()+"#Node",
 		// "first,next,prev");
