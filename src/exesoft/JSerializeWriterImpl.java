@@ -243,8 +243,8 @@ private JModel parses = new JModelImpl();
 								try {
 									String type = ((Object[]) value)[0]
 											.getClass().getName();
-									lista.add(toMap((Class.forName(type)
-											.cast(((Object[]) value)[i]))));
+									if(((Object[]) value)[i]!=null)
+									lista.add(toMap((Class.forName(type).cast(((Object[]) value)[i]))));
 								} catch (ClassNotFoundException e) {
 									e.printStackTrace();
 								} catch (NullPointerException e) {
