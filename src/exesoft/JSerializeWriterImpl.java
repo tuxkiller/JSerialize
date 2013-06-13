@@ -21,16 +21,17 @@ import java.util.TreeMap;
 
 import java.util.Iterator;
 
-public class JSerializeWriterImpl implements JSerializeWriter {
+public final class JSerializeWriterImpl implements JSerializeWriter {
 
-	JModel parses = new JModelImpl();
+private JModel parses = new JModelImpl();
 
-	static Map<String, String> knownHashes = new HashMap<String, String>();
+	private static Map<String, String> knownHashes = new HashMap<String, String>();
 
-	Map<String, String> aliases = new HashMap<String, String>(); // to be
-																	// considered
-	Map<String, String> fieldsToConsider = new HashMap<String, String>();
-
+	private Map<String, String> aliases = new HashMap<String, String>(); // to be considered
+	
+															
+	private Map<String, String>fieldsToConsider = new HashMap<String, String>();
+	
 	public JSerializeWriterImpl() {
 		fieldsToConsider.put(String.class.getName(), "value");
 		fieldsToConsider.put(List.class.getName(), "elementData");
@@ -48,8 +49,10 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 		// "first,next,prev");
 		// ADD MORE COMMON TYPES USED IN JAVA AND THEIR FIELDS
 	}
+	
+	
 
-	public Map<String, Object> prepareMap(Object ob) {
+	public Map<String, Object> prepareMap(final Object ob) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (ob != null) {
 			map = toMap(ob);
@@ -60,8 +63,24 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 		}
 		return map;
 	}
+	public Map<String , String> getAliases() { 
+		return aliases;  
+		}
+	
+	public Map<String, String> getKnownHashes() { 
+		return knownHashes;  
+		}
+	public Map<String, String> getFieldsToConsider() {
+		return fieldsToConsider;
+	}
+	public JModel getParser() { 
+		return parses; 
+		}
+	
+	
+			
 
-	Map<String, Object> toMap(Object ob) {
+	Map<String, Object> toMap(final Object ob) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (ob != null) {
@@ -77,8 +96,9 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 						|| getTypeName(field).equals(
 								"java.util.LinkedList$Node")
 						|| ob instanceof Set) {
-					if (shouldISkipThisField(c, field, false))
+					if (shouldISkipThisField(c, field, false)) {
 						continue;
+					}
 				} else if (shouldISkipThisField(c, field, true)) {
 					continue;
 				}
@@ -216,7 +236,8 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 
 							List<Object> lista = new ArrayList<Object>();
 
-							for (int i = 0; i < ((Object[]) value).length; i++) {
+							for (int i = 0; i < ((Object[]) value).length; 
+									i++) {
 
 								try {
 									String type = ((Object[]) value)[0]
@@ -226,7 +247,9 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 								} catch (ClassNotFoundException e) {
 									e.printStackTrace();
 								} catch (NullPointerException e) {
+									
 								}
+								
 							}
 							if (knownHashes.containsKey(hashString)) {
 								map.put(field.getName() + "#"
@@ -259,26 +282,27 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 		return map;
 	}
 
-	boolean isPrimitive(Field field) {
+	boolean isPrimitive(final Field field) {
 		return field.getType().isPrimitive();
 	}
 
-	void setPublic(Field field) {
-		if (!field.isAccessible())
+	void setPublic(final Field field) {
+		if (!field.isAccessible()) {
 			field.setAccessible(true);
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	Field[] getFields(Class c) {
+	Field[] getFields(final Class c) {
 		return c.getDeclaredFields();
 	}
 
-	String getTypeName(Field field) {
+	String getTypeName(final Field field) {
 		return field.getType().getName();
 	}
 
 	@Override
-	public boolean writeObject(OutputStream os, Object ob) {
+	public boolean writeObject(final OutputStream os, final Object ob) {
 		try {
 			BufferedWriter _os = new BufferedWriter(new OutputStreamWriter(os,
 					"UTF-8"));
@@ -295,7 +319,7 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 	}
 
 	// FOR TESTING PURPOSES ONLY
-	public void printMap(Map<String, Object> map) {
+	public void printMap(final Map<String, Object> map) {
 
 		Iterator<Entry<String, Object>> it = map.entrySet().iterator();
 		while (it.hasNext()) {
@@ -306,25 +330,28 @@ public class JSerializeWriterImpl implements JSerializeWriter {
 		}
 	}
 
-	void processData(String hashString, String typeName) {
+	void processData(final String hashString, final String typeName) {
 
 	}
 
-	boolean shouldISkipThisField(@SuppressWarnings("rawtypes") Class c,
-			Field field, boolean checkTransient) {
+	boolean shouldISkipThisField(@SuppressWarnings("rawtypes") final Class c,
+			final Field field, final boolean checkTransient) {
 		boolean shouldI = true;
 		String s = new String();
 		if ((s = fieldsToConsider.get(c.getName())) != null) {
-
 			if (s.contains(field.getName())) {
 				shouldI = false;
-			} else
+			} else {
 				shouldI = true;
-		} else
+			}
+		} else {
 			shouldI = false;
-		if (checkTransient)
+		}
+
+			if (checkTransient) {
 			if (Modifier.isTransient(field.getModifiers())) {
 				shouldI = true;
+			}
 			}
 		return shouldI;
 	}
