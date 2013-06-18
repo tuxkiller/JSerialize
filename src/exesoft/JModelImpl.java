@@ -1,6 +1,7 @@
 package exesoft;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -146,94 +147,215 @@ public class JModelImpl implements JModel {
 		return bufferJson.toString();
 	}
 
-	
-	private void textSearcher (String text){
-		
-	}
-
-	@Override
-	public Map<String, Object> decode(String fromJson) {
-		Map<String, Object> toJSON = new HashMap<String, Object>();
-		String Obiekt;
-		StringBuffer buffer = new StringBuffer(fromJson);
-		StringBuffer klucz = new StringBuffer("");
-		Object wartosc = null;
-		int temp;
-		int nawOtw = 0;
-		int nawZam = 0;
-		String MainClass = buffer.substring(0, buffer.indexOf(" {"));
-		buffer.delete(0, buffer.indexOf("{")+1);
-		//System.out.println("B: " + buffer.toString());
-		nawOtw++;
-		while (nawOtw!=nawZam)
+	private StringBuffer CharrArrayStringToStringBuffer (String text)
+	{
+		StringBuffer result = new StringBuffer(text);
+		for (int i=0; i<result.length(); i++)
 		{
-			if(buffer.charAt(0)=='}')
+			if (result.charAt(i)==',' || result.charAt(i)==' ')
 			{
-				nawZam++;
-				buffer.deleteCharAt(0);
+				result.delete(i, i+1);
+				i--;
 			}
 				
-			//"NAZWA":[V, V]
-			if (buffer.indexOf("\"")==0) 
-			{
-				buffer.deleteCharAt(0);//USUWAMY "
-				temp = buffer.indexOf("\"");
-				klucz.append(buffer.substring(0, temp));
-				buffer.delete(0, temp+1);//USUWAMY CIAG ORAZ "
-				//System.out.println("Klucz: " + klucz + " w buferze: " + buffer);
-				if (buffer.substring(0, 1) == ":[") 
-				{
-					//usuwamy ":"  zostaje [10, 2] + smieci...
-					buffer.deleteCharAt(0);//USUWAMY :
-					System.out.println("Klucz: " + klucz + " w buferze: " + buffer);
-					
-					// CZY INT ARRAY
-					if (isWrapperType(IntArrayData.class))
-					{
+			
+		}
+
+		return result;
+	}
+	
+	private Map <String, Object> handleMapFromList ( String inString ){
+		Map <String, Object> outMap = new HashMap <String, Object>();
+		StringBuffer klucz = new StringBuffer("");
+		StringBuffer objName = new StringBuffer("");
+		String temp;
+		while (!inString.isEmpty()){
+			
+			if (inString.charAt(0)=='"'){
+				temp = inString.substring(1, inString.indexOf(':')-1);
+				klucz.append(temp);
+				inString = inString.substring(inString.indexOf(':')+1, inString.length());
+				if (inString.charAt(0)=='['){
 						klucz.append("#IntArray");
-						
-						String toIntArrayBuffer = buffer.substring(0, buffer.indexOf("]")+1);
-						String[] items=toIntArrayBuffer.replaceAll("\\[", "")
-								.replaceAll("\\]","")
-									.split(", ");
+						String toIntArrayBuffer = inString.substring(0,
+								inString.indexOf("]") + 1);
+						String[] items = toIntArrayBuffer.replaceAll("\\[ ", "")
+								.replaceAll("\\ ]", "").split(", ");
 
 						int[] results = new int[items.length];
 						for (int i = 0; i < items.length; i++) {
-						    try {
-						        results[i] = Integer.parseInt(items[i]);
-						    } catch (NumberFormatException nfe) {};
+							try {
+								results[i] = Integer.parseInt(items[i]);
+							} catch (NumberFormatException nfe) {
+							}
+							
 						}
-						//INT[] TO LIST 
-					    List<Integer> intList = new ArrayList<Integer>();
-					    for (int index = 0; index < results.length; index++)
-					    {
-					        intList.add(results[index]);
-					    }
-					    //KONIEC: INT[] TO LIST 
-					    
-					    toJSON.put(klucz.toString(), intList);
-					} 
-				} else if (buffer.substring(0, 2) == ": {"){
-					nawOtw++;
-					if (isWrapperType(List.class)){
-						klucz.append("#java.util.List");
-						System.out.println("TO LISTA");
+						
+						List<Integer> intList = new ArrayList<Integer>();
+						for (int index = 0; index < results.length; index++) {
+							intList.add(results[index]);
+						}
+						
+						inString = inString.substring(inString.indexOf("]")+3, inString.length());
+						outMap.put(klucz.toString(), intList);
+						klucz.delete(0, klucz.length());
+					
+					
+				} else if (isNumeric(inString.valueOf(inString.charAt(0)))){
+					klucz.append("#int");
+					if (inString.indexOf(',')<inString.indexOf(']')){
+						
+						outMap.put(klucz.toString(), Integer.parseInt(inString.substring(0, inString.indexOf(','))));
+						inString = inString.substring(inString.indexOf(',')+2);
+						klucz.delete(0, klucz.length());
+					} else {
+						outMap.put(klucz.toString(), Integer.parseInt(inString.substring(0, inString.indexOf(']'))));
+						inString = inString.substring(inString.indexOf(']')+2);
+						klucz.delete(0, klucz.length());
 					}
-				} else if (buffer.charAt(0) == ':')
+				} else if (inString.charAt(1)=='{') {
+					String charArrayTemp = "";
+					String objectKey = "value";
+					Map <String, Object> objectMap = new HashMap <String, Object>();
+					klucz.append("#java.lang.String");
+					charArrayTemp = inString.substring(inString.indexOf('[')+2, inString.indexOf(']')-1);
+					CharrArrayStringToStringBuffer(inString.substring(inString.indexOf('[')+2, inString.indexOf(']')-1));
+					objName = CharrArrayStringToStringBuffer(inString.substring(inString.indexOf('[')+2, inString.indexOf(']')-1));
+					objectKey = objectKey+"#charArray";
+					List<String> items = Arrays.asList(charArrayTemp.split("\\s*,\\s*"));
+					inString = inString.substring(inString.indexOf("]")+3, inString.length());
+					objectMap.put(objectKey, items);
+					outMap.put(klucz.toString(), objectMap);
+					klucz.delete(0, klucz.length());
+
+				} else if ( inString.substring(0, 4).equals("true") || inString.substring(0, 5).equals("false") || inString.substring(0, 4).equals("null")) 
 				{
-				buffer.deleteCharAt(0);//USUWAMY :
-				System.out.println("Klucz: " + klucz + " w buferze: " + buffer);
-				//wartosc = buffer.substring(0, buffer.indexOf(", "));
-				if (isNumeric(buffer.substring(0, buffer.indexOf(", "))))
+					klucz.append("#boolean");
+					String booleanWartosc = "";
+					if (inString.indexOf(',')<inString.indexOf(']')){
+						booleanWartosc=inString.substring(0, inString.indexOf(','));
+						if (!booleanWartosc.isEmpty())
+							outMap.put(klucz.toString(), Boolean.valueOf(booleanWartosc));
+						inString = inString.substring(inString.indexOf(',')+2);
+						klucz.delete(0, klucz.length());
+					} else 
+					{
+						booleanWartosc=inString.substring(0, inString.indexOf('['));
+								if (!booleanWartosc.isEmpty())
+								{
+									outMap.put(klucz.toString(), Boolean.valueOf(booleanWartosc));
+								}
+								
+						inString = inString.substring(inString.indexOf(']')+2);
+						klucz.delete(0, klucz.length());
+					}
+				}
+			} 
+
+		}
+		outMap.put("ObjName", objName);
+		return outMap;
+	}
+		
+		
+		
+		
+	
+	
+	
+	
+	private int JSonObjectExtractor (String text){
+		int nawOtw=0, nawZam=0;
+		int koniec_obj=0;
+		for (int i=0; i<text.length();i++)
+		{
+			if (text.charAt(i)=='{')
+				nawOtw++;
+			if (text.charAt(i)=='}')
+				nawZam++;
+			if (nawOtw==nawZam)
+			{
+				koniec_obj=i;
+				break;
+			}
+				
+		}
+		return koniec_obj;
+	}
+
+
+	
+	private Map<String, Object> stringBufferToMap (StringBuffer buffer)
+ {
+		
+		StringBuffer klucz = new StringBuffer("");
+		String globKey = null;
+		String stringTemp;
+		int temp;
+		Map<String, Object> mapaDecode = new HashMap<String, Object>();
+		buffer.deleteCharAt(buffer.length() - 1);
+		if (buffer.indexOf("\"") == 0) {
+			buffer.deleteCharAt(0);// USUWAMY "
+			temp = buffer.indexOf("\"");
+			klucz.append(buffer.substring(0, temp));
+			buffer.delete(0, temp + 1);
+			if (buffer.substring(0, 3).equals(":[ ")) {
+				buffer.delete(0, 3);
+				int tempInt=JSonObjectExtractor(buffer.toString())+1;
+				stringTemp = buffer.substring(0, tempInt);
+				buffer = new StringBuffer(buffer.substring(tempInt+2));
+				if (stringTemp.charAt(1)=='"')
 				{
-					buffer.delete(0, buffer.indexOf(", "));
-					klucz.append("#Integer");
-					toJSON.put(klucz.toString(), buffer.substring(0, buffer.indexOf(", ")));
+					klucz.append("#[Ljava.lang.Object;Array ");
+					Map <String, Object> innerMap = new HashMap<String, Object>();
+					innerMap = handleMapFromList(stringTemp.substring(1));
+					globKey = innerMap.get("ObjName").toString();
+					innerMap.remove("ObjName");
+					klucz.append(" " + globKey);
+					mapaDecode.put(klucz.toString(), innerMap);
+					while (buffer.length()>1)
+					{
+						klucz = new StringBuffer("#[Ljava.lang.Object;Array ");
+						tempInt=JSonObjectExtractor(buffer.toString())+1;
+						stringTemp = buffer.substring(0, tempInt);
+						buffer = new StringBuffer(buffer.substring(tempInt+2));
+						innerMap = handleMapFromList(stringTemp.substring(1));
+						globKey = innerMap.get("ObjName").toString();
+						innerMap.remove("ObjName");
+						klucz.append(" " + globKey);
+						mapaDecode.put(klucz.toString(), innerMap);
+					}
 				}
-				}
+				
 			}
 
-			}
+		}
+		
+		return mapaDecode;
+
+	}
+	
+	
+	
+	@Override
+	public Map<String, Object> decode(String fromJson) {
+		Map<String, Object> toJSON = new HashMap<String, Object>();
+		StringBuffer buffer = new StringBuffer(fromJson);
+		
+
+
+		String mainClass = buffer.substring(0, buffer.indexOf(" {"));
+		String classType = mainClass.substring(mainClass.lastIndexOf(".")+1, mainClass.length());
+		buffer.delete(0, buffer.indexOf(" {")+1);
+		buffer = new StringBuffer(buffer.substring(0, JSonObjectExtractor(buffer.toString())));
+		System.out.println(classType);
+		buffer.delete(0, buffer.indexOf(": {")+3);
+		toJSON.put("#JSerializeMetaData#RootClassName", mainClass);
+		toJSON.put(classType, stringBufferToMap(buffer));
+		
+		
+		
+		
 		return toJSON;
 		}
 		
